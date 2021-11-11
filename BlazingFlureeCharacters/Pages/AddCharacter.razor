@@ -1,0 +1,182 @@
+﻿@page "/add-character"
+@using BlazingFlureeCharacters.Data
+@using System.ComponentModel.DataAnnotations;
+@inject ICharacterService  CharacterService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Add Character</PageTitle>
+
+<h1>Add New Character</h1>
+
+<EditForm Model="@characterForm" OnValidSubmit="@HandleValidSubmit" class="mb-3">
+    <DataAnnotationsValidator />
+    <ValidationMessage For="() => characterForm.Successful" />
+    <ValidationSummary />
+    <div class="mb-3">
+        <label for="characterName">Name</label>
+        <InputText class="form-control" id="characterName" @bind-Value="characterForm.Name" placeholder="Enter Character Name" />
+    </div>
+    <div class="mb-3">
+        <label for="characterDescription">Description</label>
+        <div class="col-sm-10">
+        <InputTextArea class="form-control" @bind-Value="characterForm.Description" id="characterDescription"/>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="characterRace">Race</label>
+        <div class="col-sm-10">
+        <InputSelect class="form-control" @bind-Value="characterForm.Race" id="characterRace">
+            <option>Dragonborn</option>
+            <option>Dwarf</option>
+            <option>Elf</option>
+            <option>Gnome</option>
+            <option>Half-Elf</option>
+            <option>Halfling</option>
+            <option>Half-Orc</option>
+            <option>Human</option>
+            <option>Tiefling</option>
+        </InputSelect>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="characterClass">Class</label>
+        <div class="col-sm-10">
+        <InputSelect class="form-control" @bind-Value="characterForm.Class" id="characterClass">
+            <option>Barbarian</option>
+            <option>Bard</option>
+            <option>Cleric</option>
+            <option>Druid</option>
+            <option>Fighter</option>
+            <option>Monk</option>
+            <option>Paladin</option>
+            <option>Ranger</option>
+            <option>Rogue</option>
+            <option>Sorcerer</option>
+            <option>Warlock</option>
+            <option>Wizard</option>
+        </InputSelect>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="characterHP">HP</label>
+        <div class="col-sm-10">
+        <InputNumber class="form-control" @bind-Value="characterForm.HP" id="characterHP" placeholder="Enter Health Points"/>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="characterStrength">Strength</label>
+        <div class="col-sm-10">
+        <InputNumber class="form-control" @bind-Value="characterForm.Strength" id="characterStrength" placeholder="0"/>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="characterDexterity">Dexterity</label>
+        <div class="col-sm-10">
+        <InputNumber class="form-control" @bind-Value="characterForm.Dexterity" id="characterDexterity" placeholder="0"/>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="characterConstitution">Constitution</label>
+        <div class="col-sm-10">
+        <InputNumber class="form-control" @bind-Value="characterForm.Constitution" id="characterConstitution" placeholder="0"/>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="characterIntelligence">Intelligence</label>
+        <div class="col-sm-10">
+        <InputNumber class="form-control" @bind-Value="characterForm.Intelligence" id="characterIntelligence" placeholder="0"/>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="characterWisdom">Wisdom</label>
+        <div class="col-sm-10">
+        <InputNumber class="form-control" @bind-Value="characterForm.Wisdom" id="characterWisdom" placeholder="0"/>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="characterCharisma">Charisma</label>
+        <div class="col-sm-10">
+        <InputNumber class="form-control" @bind-Value="characterForm.Charisma" id="characterCharisma" placeholder="0"/>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+
+@code {
+    private int currentCount = 0;
+    private CharacterForm characterForm = new CharacterForm();
+    private ValidationMessageStore? messageStore;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }    
+
+    private async void HandleValidSubmit()
+    {
+        var successful = await CharacterService.CreateCharacter(new ACharacter()
+            {
+                Name = characterForm.Name,
+                Description = characterForm.Description,
+                Class = characterForm.Class,
+                Race = characterForm.Race,
+                HP = characterForm.HP,
+                Strength = characterForm.Strength,
+                Dexterity = characterForm.Dexterity,
+                Constitution = characterForm.Constitution,
+                Intelligence = characterForm.Intelligence,
+                Wisdom = characterForm.Wisdom,
+                Charisma = characterForm.Charisma,
+            });
+        if(successful)
+            NavigationManager.NavigateTo("", true);
+
+        messageStore?.Clear();
+        messageStore?.Add(() => characterForm.Successful, "Unable to save character.");
+    }
+
+    public class CharacterForm
+    {
+        [Required]
+        public string Name { get; set; }
+
+        public string Description { get; set; }
+
+        [Required]
+        public string Class { get; set; } = "Dragonborn";
+
+        [Required]
+        public string Race { get; set; } = "Barbarian";
+
+        [Required]
+        [Range(1, 100000, ErrorMessage = "HP invalid (1-100000).")]
+        public int HP { get; set; }
+
+        [Required]
+        [Range(1, 100000, ErrorMessage = "Strength invalid (1-100000).")]
+        public int Strength { get; set; }
+
+        [Required]
+        [Range(1, 100000, ErrorMessage = "Dexterity invalid (1-100000).")]
+        public int Dexterity { get; set; }
+
+        [Required]
+        [Range(1, 100000, ErrorMessage = "Constitution invalid (1-100000).")]
+        public int Constitution { get; set; }
+
+        [Required]
+        [Range(1, 100000, ErrorMessage = "Intelligence invalid (1-100000).")]
+        public int Intelligence { get; set; }
+
+        [Required]
+        [Range(1, 100000, ErrorMessage = "Wisdom invalid (1-100000).")]
+        public int Wisdom { get; set; }
+
+        [Required]
+        [Range(1, 100000, ErrorMessage = "Charisma invalid (1-100000).")]
+        public int Charisma { get; set; } 
+
+        public string Successful { get; set; }
+    }
+}

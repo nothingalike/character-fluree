@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using BlazingFlureeCharacters.Data
+@inject ICharacterService  CharacterService
 
 <PageTitle>Index</PageTitle>
 
@@ -6,6 +8,49 @@
 
 <h3>Characters</h3>
 
-@code {
+<button type="button" class="btn btn-primary" @onclick="GetCharacterList">Refresh List</button>
 
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col"></th>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Description</th>
+      <th scope="col">Class</th>
+      <th scope="col">Race</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach(var c in Characters)
+    {
+    <tr>
+        <td><img width="100" src=@CharacterAvatar(c) /></td>
+        <th scope="row">@c.CollectionId</th>
+        <td>@c.Name</td>
+        <td>@c.Description</td>
+        <td>@c.Class</td>
+        <td>@c.Race</td>
+    </tr> 
+    }
+  </tbody>
+</table>
+
+@code {
+    public IEnumerable<ACharacter> Characters { get; set; } = new List<ACharacter>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCharacterList();
+    }
+
+    private async Task GetCharacterList()
+    {
+        Characters = await CharacterService.GetCharactersAsync();
+    }
+
+    public string CharacterAvatar(ACharacter character)
+    {
+        return $"https://robohash.org/{character.CollectionId}?set=set2";
+    }
 }

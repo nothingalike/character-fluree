@@ -1,17 +1,16 @@
+using BlazingFlureeCharacters.Data;
 using FlureeDotnetLibrary;
 using FlureeDotnetLibrary.FlureeCommand;
 using FlureeDotnetLibrary.FlureeDatabase;
-using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddMediatR();
-
 //Fluree Setup
 builder.Services.AddFlureeDotnetService();
+builder.Services.AddTransient<ICharacterService, CharacterService>();
 
 var serviceProvider = builder.Services.BuildServiceProvider();
 
